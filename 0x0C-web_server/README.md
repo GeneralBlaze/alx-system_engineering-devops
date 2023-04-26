@@ -1,1 +1,1 @@
-Readme for web serversessions lessons.
+Readme for web server session lessons.
