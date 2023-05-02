@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+#Creating custom http response header
+
+apt-get -y update
+apt-get -y install nginx
+
+add_header X-Served-By $hostname;
+
+service nginx restart
