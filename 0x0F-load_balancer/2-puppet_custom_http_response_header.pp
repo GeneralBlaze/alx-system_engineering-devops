@@ -1,25 +1,26 @@
-# Installs a Nginx server with custome HTTP header
+#!/usr/bin/env bash
+# Configure server with HAproxy
+# Distribute requests using a roundrobin algorithm
 
-exec {'update':
-  provider => shell,
-  command  => 'sudo apt-get -y update',
-  before   => Exec['install Nginx'],
-}
-
-exec {'install Nginx':
-  provider => shell,
-  command  => 'sudo apt-get -y install nginx',
-  before   => Exec['add_header'],
-}
-
-exec { 'add_header':
-  provider    => shell,
-  environment => ["HOST=${hostname}"],
-  command     => 'sudo sed -i "s/include \/etc\/nginx\/sites-enabled\/\*;/include \/etc\/nginx\/sites-enabled\/\*;\n\tadd_header X-Served-By \"$HOST\";/" /etc/nginx/nginx.conf',
-  before      => Exec['restart Nginx'],
-}
-
-exec { 'restart Nginx':
-  provider => shell,
-  command  => 'sudo service nginx restart',
-}
+sudo apt-get update
+sudo apt-get -y install haproxy
+sudo sed -i 's/ENABLED=0/ENABLED=1/' /etc/default/haproxy
+sudo tee /etc/haproxy/haproxy.cfg > /dev/null <<EOF
+global
+    daemon
+    maxconn 100
+defaults
+    mode http
+    timeout client 5000ms
+    timeout connect 5000ms
+    timeout server 5000ms
+listen appname
+    bind 0.0.0.0:80
+    mode http
+    balance roundrobin
+    option httpclose
+    option forwardfor
+    server 18996-web-01 107.23.101.44:80 check
+    server 18996-web-02 54.209.89.216:80 check
+EOF
+sudo service haproxy start
