@@ -14,15 +14,15 @@ print_domain_info() {
       ;;
     lb-01)
       record_type="A"
-      destination="lb-01-IP"
+      destination="54.165.26.100"
       ;;
     web-01)
       record_type="A"
-      destination="web-01-IP"
+      destination="100.25.203.75"
       ;;
     web-02)
       record_type="A"
-      destination="web-02-IP"
+      destination="100.25.29.110"
       ;;
     *)
       echo "Invalid subdomain: $subdomain"
