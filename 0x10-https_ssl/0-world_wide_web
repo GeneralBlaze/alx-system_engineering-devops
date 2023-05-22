@@ -1,48 +1,18 @@
 #!/usr/bin/env bash
-#Configure your domain zone so that the subdomain www points to your lb ip
-print_domain_info() {
-  local domain="$1"
-  local subdomain="$2"
-  
-  local record_type
-  local destination
-  
-  case $subdomain in
-    www)
-      record_type="CNAME"
-      destination="lb-01"
-      ;;
-    lb-01)
-      record_type="A"
-      destination="54.165.26.100"
-      ;;
-    web-01)
-      record_type="A"
-      destination="100.25.203.75"
-      ;;
-    web-02)
-      record_type="A"
-      destination="100.25.29.110"
-      ;;
-    *)
-      echo "Invalid subdomain: $subdomain"
-      return
-      ;;
-  esac
-  
-  echo "The subdomain $subdomain is a $record_type record and points to $destination"
+# This script displays information for subdomains of an address
+print_domain_info()
+{
+	command=$(dig "$2"."$1" | grep -A1 'ANSWER SECTION' | tail -n 1)
+	echo "$2 $command" | awk '{print "The subdomain " $1 " is a " $5 " record and points to " $6}'
 }
 
-if [ $# -eq 1 ]; then
-  domain="$1"
-  print_domain_info "$domain" "www"
-  print_domain_info "$domain" "lb-01"
-  print_domain_info "$domain" "web-01"
-  print_domain_info "$domain" "web-02"
-elif [ $# -eq 2 ]; then
-  domain="$1"
-  subdomain="$2"
-  print_domain_info "$domain" "$subdomain"
-else
-  echo "Invalid number of arguments"
+if [ $# -eq 1 ]
+then
+	print_domain_info "$1" "www"
+	print_domain_info "$1" "lb-01"
+	print_domain_info "$1" "web-01"
+	print_domain_info "$1" "web-02"
+elif [ $# -eq 2 ]
+then
+	print_domain_info "$1" "$2"
 fi
