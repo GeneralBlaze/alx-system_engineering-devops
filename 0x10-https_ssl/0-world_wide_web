@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+#Configure your domain zone so that the subdomain www points to your lb ip
 print_domain_info() {
   local domain="$1"
   local subdomain="$2"
